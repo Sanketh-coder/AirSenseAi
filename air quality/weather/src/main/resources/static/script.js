@@ -1,8 +1,45 @@
-const gasValue = parseInt(document.getElementById("gasValue").innerText);
-document.getElementById("weatherInfo");
+let tempValue =
+parseInt(document.getElementById("temp").innerText);
 
-weatherInfo.innerHTML =
-"📍 Location : Smart Environment Lab | ☀ Weather : Clear Sky";
+let humValue =
+parseInt(document.getElementById("hum").innerText);
+
+let gasValue =
+parseInt(document.getElementById("gas").innerText);
+
+
+// ALERT SYSTEM
+
+const alertBox =
+document.getElementById("alertBox");
+
+if(gasValue > 500)
+{
+    alertBox.innerHTML =
+    "⚠ Dangerous Air Quality Detected";
+
+    alertBox.className = "danger";
+
+    let speech =
+    new SpeechSynthesisUtterance(
+    "Warning! Dangerous air quality detected");
+
+    speechSynthesis.speak(speech);
+}
+else if(gasValue > 200)
+{
+    alertBox.innerHTML =
+    "⚠ Moderate Pollution Detected";
+
+    alertBox.className = "warning";
+}
+else
+{
+    alertBox.innerHTML =
+    "✅ Air Quality Good";
+
+    alertBox.className = "safe";
+}
 
 
 // AI PREDICTION
@@ -12,74 +49,50 @@ document.getElementById("predictionText");
 
 if(gasValue > 500)
 {
-predictionText.innerHTML =
-"AI Prediction : Air quality may become hazardous soon.";
+    predictionText.innerHTML =
+    "AI Prediction: Air quality may become hazardous soon.";
+}
+else if(gasValue > 200)
+{
+    predictionText.innerHTML =
+    "AI Prediction: Pollution level increasing gradually.";
 }
 else
 {
-predictionText.innerHTML =
-"AI Prediction : Environment remains stable.";
+    predictionText.innerHTML =
+    "AI Prediction: Environment remains safe.";
 }
 
 
-// CHART
+// LIVE CHART
 
 const ctx =
-document.getElementById('airChart').getContext('2d');
+document.getElementById('airChart');
 
 new Chart(ctx, {
 
-    type: 'line',
+type: 'line',
 
-    data: {
+data: {
 
-        labels: ['Temperature','Humidity','Gas'],
+labels: ['Temperature', 'Humidity', 'Gas'],
 
-        datasets: [{
+datasets: [{
 
-            label: 'Live Sensor Data',
+label: 'Live Sensor Data',
 
-            data: [tempValue,humValue,gasValue],
+data: [tempValue, humValue, gasValue],
 
-            borderColor: graphColor,
+borderWidth: 3
 
-            backgroundColor: graphColor,
+}]
 
-            borderWidth: 4,
+},
 
-            tension:0.4
+options: {
 
-        }]
-    },
+responsive: true
 
-    options: {
-        responsive:true
-    }
-});
-
-
-// AQI GAUGE
-
-const gaugeFill =
-document.getElementById("gaugeFill");
-
-const gaugeText =
-document.getElementById("gaugeText");
-
-let gaugeDegree = gasValue;
-
-if(gaugeDegree > 100)
-{
-gaugeDegree = 100;
 }
 
-gaugeFill.style.background =
-`conic-gradient(${graphColor} ${gaugeDegree * 3.6}deg,#222 0deg)`;
-
-gaugeText.innerHTML = gasValue;
-
-
-// QR CODE
-
-QRCode.toCanvas(document.getElementById('qrCanvas'),
-window.location.href);
+});
