@@ -1,88 +1,82 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head>
 
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="1">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta http-equiv="refresh" content="1">
 
 <title>AirSense AI</title>
 
 <link rel="stylesheet" th:href="@{/style.css}">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 
 </head>
 
 <body>
 
+<div class="particles"></div>
+
 <div class="container">
 
-<h1 class="title">🌍 AirSense AI</h1>
+<div class="header">
 
-<p class="subtitle">
-Smart IoT Environmental Monitoring Dashboard
+<h1>🌍 AirSense AI</h1>
+
+<p>
+Smart Human Safety & Environmental Monitoring System
 </p>
+
+<div class="time-box" id="clock"></div>
+
+</div>
+
 
 <div class="cards">
 
-<div class="card temp-card">
-
+<div class="card">
 <h2>🌡 Temperature</h2>
-
-<h1 id="temp" th:text="${WeatherTest.temp}">30</h1>
-
+<h1 id="temp" th:text="${WeatherTest.temp}"></h1>
 <p>°C</p>
-
 </div>
 
-<div class="card hum-card">
-
+<div class="card">
 <h2>💧 Humidity</h2>
-
-<h1 id="hum" th:text="${WeatherTest.hum}">60</h1>
-
+<h1 id="hum" th:text="${WeatherTest.hum}"></h1>
 <p>%</p>
-
 </div>
 
 <div class="card gas-card">
-
 <h2>🌫 Air Quality</h2>
-
-<h1 id="gas" th:text="${gas}">100</h1>
-
+<h1 id="gasValue" th:text="${gas}"></h1>
 <p>AQI</p>
-
 </div>
 
 </div>
 
-<div id="alertBox"></div>
+
+<div id="aqiStatus"></div>
+
+<div id="healthAdvice"></div>
+
+<div id="comfortIndex"></div>
+
+<div id="pollutionSource"></div>
+
+<div id="sensorHealth"></div>
+
+<div id="weatherInfo"></div>
 
 <div class="prediction-box">
-
 <h2>🤖 AI Prediction</h2>
-
-<p id="predictionText">
-Analyzing environment...
-</p>
-
+<p id="predictionText"></p>
 </div>
 
-<div class="chart-box">
 
+<div class="chart-container">
 <canvas id="airChart"></canvas>
-
 </div>
-
-</div>
-
-<script th:src="@{/script.js}"></script>
-
-</body>
 </html>
