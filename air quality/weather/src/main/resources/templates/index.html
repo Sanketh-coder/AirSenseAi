@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AirSense AI</title>
+
+<link rel="stylesheet" th:href="@{/style.css}">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1 class="title">🌍 AirSense AI</h1>
+
+<p class="subtitle">
+Smart IoT Environmental Monitoring Dashboard
+</p>
+
+<div class="cards">
+
+<div class="card temp-card">
+
+<h2>🌡 Temperature</h2>
+
+<h1 id="temp" th:text="${WeatherTest.temp}">30</h1>
+
+<p>°C</p>
+
+</div>
+
+<div class="card hum-card">
+
+<h2>💧 Humidity</h2>
+
+<h1 id="hum" th:text="${WeatherTest.hum}">60</h1>
+
+<p>%</p>
+
+</div>
+
+<div class="card gas-card">
+
+<h2>🌫 Air Quality</h2>
+
+<h1 id="gas" th:text="${gas}">100</h1>
+
+<p>AQI</p>
+
+</div>
+
+</div>
+
+<div id="alertBox"></div>
+
+<div class="prediction-box">
+
+<h2>🤖 AI Prediction</h2>
+
+<p id="predictionText">
+Analyzing environment...
+</p>
+
+</div>
+
+<div class="chart-box">
+
+<canvas id="airChart"></canvas>
+
+</div>
+
+</div>
+
+<script th:src="@{/script.js}"></script>
+
+</body>
+</html>

@@ -1,0 +1,155 @@
+/* Code Written by Rishi Tiwari
+ *  Website:- https://tricksumo.com
+*/
+
+
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+#include "DHT.h"
+DHT dht;
+
+// Update HOST URL here
+
+#define HOST "192.168.36.24"          // Enter HOST URL without "http:// "  and "/" at the end of URL
+
+#define WIFI_SSID "BPS"            // WIFI SSID here                                   
+#define WIFI_PASSWORD "12345678"        // WIFI password here
+
+int humidity =0;
+int temperature=0;
+
+
+// Declare global variables which will be uploaded to server
+
+// defines pins numbers
+
+
+String  postData;
+String distance;
+
+
+
+
+
+
+void setup() {
+
+//  pinMode(pumpPin, OUTPUT); //pump
+Serial.begin(115200); 
+dht.setup(D1);   /* D1 is used for data communication */
+  pinMode(A0,INPUT);  
+Serial.println("Communication Started \n\n");  
+delay(1000);
+  
+
+//pinMode(LED_BUILTIN, OUTPUT);     // initialize built in led on the board
+ 
+
+WiFi.mode(WIFI_STA);   
+
+WiFi.disconnect();
+delay(100);                                  //try to connect with wifi
+Serial.print("Connecting to ");
+Serial.print(WIFI_SSID);
+WiFi.begin(WIFI_SSID, WIFI_PASSWORD);   
+
+while (WiFi.status() != WL_CONNECTED) 
+{ Serial.print(".");
+    delay(500); }
+
+Serial.println();
+Serial.print("Connected to ");
+Serial.println(WIFI_SSID);
+Serial.print("IP Address is : ");
+Serial.println(WiFi.localIP());    //print local IP address
+
+delay(30);
+}
+
+
+void loop() { 
+
+
+ temperature = dht.getTemperature(); /* Get temperature value */
+   humidity = dht.getHumidity(); /* Get humidity value */
+  int mq135 = analogRead(A0); 
+ 
+
+HTTPClient http;    // http object of class HTTPClient
+WiFiClient wclient; // wclient object of class WiFiClient   
+
+
+
+
+
+
+// Convert integer variables to string
+
+
+ int temp= temperature ;
+ int hum=humidity ;
+
+String temp1 = String(temp);  
+
+String hum1 = String(hum);  
+
+String gas=String(mq135);
+
+
+
+
+
+// distance = String(my_per);  
+//postData = "distance=" + distance;
+
+//String Wlevel = "Wlevele=" + distance;
+
+
+// We can post values to PHP files as  example.com/dbwrite.php?name1=val1&name2=val2&name3=val3
+// Hence created variable postDAta and stored our variables in it in desired format
+// For more detials, refer:- https://www.tutorialspoint.com/php/php_get_post.htm
+
+// Update Host URL here:-  
+
+
+
+  
+http.begin(wclient, "http://192.168.36.24:9094/weatherapp/"+ temp1+ "/" +hum1+ "/" +gas );              // Connect to host where MySQL databse is hosted
+
+
+
+http.addHeader("Content-Type", "application/x-www-form-urlencoded");            //Specify content-type header 
+int httpCode = http.GET();   // Send POST request to php file and store server response code in variable named httpCode
+Serial.println("Values are, distance = " + temp1+  "/" +hum1 );
+
+// if connection eatablished then do this
+if (httpCode == 200) { Serial.println("Values uploaded successfully."); 
+Serial.println(httpCode); 
+String webpage = http.getString();    // Get html webpage output and store it in a string
+Serial.println(webpage + "\n"); 
+}
+
+
+
+
+
+// if failed to connect then return and restart
+
+else { 
+  Serial.println(httpCode); 
+  Serial.println("Failed to upload values. \n"); 
+  http.end(); 
+  return; 
+  }
+
+
+//delay(3000); 
+
+//digitalWrite(LED_BUILTIN, LOW);
+//delay(3000);
+//digitalWrite(LED_BUILTIN, HIGH);
+
+  }
+
+
+
