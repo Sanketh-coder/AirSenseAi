@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="1">
+
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -19,14 +19,27 @@
 </head>
 
 <body>
+	
+	<source
+	src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"
+	type="audio/ogg">
 
+	</audio>
+	
+
+	<div class="particles"></div>
+	
 <div class="container">
 
 <h1 class="title">🌍 AirSense AI</h1>
 
+
+
 <p class="subtitle">
 Smart IoT Environmental Monitoring Dashboard
 </p>
+
+<h2 id="clock"></h2>
 
 <div class="cards">
 
@@ -64,6 +77,17 @@ Smart IoT Environmental Monitoring Dashboard
 
 <div id="alertBox"></div>
 
+<h2 id="aqiLevel"></h2>
+
+
+
+
+
+<!-- FLEX SECTION START -->
+
+<div class="flex-section">
+	
+
 <div class="prediction-box">
 
 <h2>🤖 AI Prediction</h2>
@@ -71,6 +95,67 @@ Smart IoT Environmental Monitoring Dashboard
 <p id="predictionText">
 Analyzing environment...
 </p>
+
+</div>
+
+
+
+<div class="prediction-box">
+
+<h2>🧠 AI Health Recommendation</h2>
+
+<p id="healthAdvice"></p>
+
+</div>
+
+
+<div class="prediction-box">
+
+<h2>🌡 Comfort Index</h2>
+
+<p id="comfortIndex"></p>
+
+</div>
+
+
+
+<div class="prediction-box">
+
+<h2>🧪 Pollution Source Detection</h2>
+
+<p id="pollutionSource"></p>
+
+</div>
+
+<div class="prediction-box">
+
+<h2>🔋 Sensor Health Monitor</h2>
+
+<p>
+🟢 MQ135 Connected
+<br>
+🟢 DHT11 Connected
+<br>
+🟢 WiFi Connected
+</p>
+
+</div>
+
+<div class="prediction-box">
+
+<h2>📊 AQI Gauge</h2>
+
+<div class="gauge">
+
+<div class="gauge-fill"
+id="gaugeFill"></div>
+
+<div class="gauge-cover"
+id="gaugeText">0</div>
+
+</div>
+
+</div>
 
 </div>
 

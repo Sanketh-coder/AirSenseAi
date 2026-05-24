@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import java.util.*;
 
 import javax.servlet.http.HttpSession;
@@ -97,5 +100,58 @@ public class WeatherController {
 				
 		return "/index";
 	}
+	
+    @GetMapping("/live-data")
+
+    @ResponseBody
+
+    public Map<String,Object> liveData()
+
+    {
+
+        int myid = 1;
+
+        Long mynewid = (long) myid;
+
+
+        WeatherTest weather =
+        wrepo.findByWid(mynewid);
+
+
+        Map<String,Object> data =
+        new HashMap<>();
+
+
+        if(weather != null)
+        {
+
+            data.put(
+            "temp",
+            weather.getTemp());
+
+            data.put(
+            "hum",
+            weather.getHum());
+
+            data.put(
+            "gas",
+            weather.getGas());
+
+        }
+        else
+        {
+
+            data.put("temp","0");
+
+            data.put("hum","0");
+
+            data.put("gas","0");
+
+        }
+
+
+        return data;
+
+    }
 
 }
