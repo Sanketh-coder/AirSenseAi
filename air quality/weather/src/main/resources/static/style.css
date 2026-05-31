@@ -336,3 +336,268 @@ opacity:1;
 }
 
 }
+
+
+/* ================= WEATHER ANIMATION ================= */
+
+.weather-animation{
+
+position:fixed;
+
+top:0;
+
+left:0;
+
+width:100%;
+
+height:100%;
+
+overflow:hidden;
+
+z-index:-1;
+
+}
+
+
+
+/* ================= SUN ================= */
+
+.sun{
+
+position:absolute;
+
+top:80px;
+
+right:80px;
+
+width:140px;
+
+height:140px;
+
+border-radius:50%;
+
+background:yellow;
+
+box-shadow:
+0 0 80px yellow,
+0 0 120px orange;
+
+display:none;
+
+animation:sunPulse 3s infinite;
+
+}
+
+
+@keyframes sunPulse{
+
+50%{
+
+transform:scale(1.1);
+
+}
+
+}
+
+
+
+/* ================= RAIN ================= */
+
+.rain{
+
+position:absolute;
+
+width:100%;
+
+height:100%;
+
+display:none;
+
+background-image:
+linear-gradient(
+transparent,
+rgba(255,255,255,0.4));
+
+background-size:3px 30px;
+
+animation:rainMove 0.4s linear infinite;
+
+opacity:0.5;
+
+}
+
+
+@keyframes rainMove{
+
+0%{
+background-position:0 0;
+}
+
+100%{
+background-position:-20px 100px;
+}
+
+}
+
+
+
+/* ================= FOG ================= */
+
+.fog{
+
+position:absolute;
+
+width:100%;
+
+height:100%;
+
+display:none;
+
+background:
+rgba(255,255,255,0.08);
+
+backdrop-filter:blur(10px);
+
+animation:fogMove 10s linear infinite;
+
+}
+
+
+@keyframes fogMove{
+
+0%{
+transform:translateX(-50px);
+}
+
+100%{
+transform:translateX(50px);
+}
+
+}
+
+
+
+/* ================= SMOKE ================= */
+
+.smoke{
+
+position:absolute;
+
+width:100%;
+
+height:100%;
+
+display:none;
+
+background:
+radial-gradient(
+rgba(100,100,100,0.15),
+transparent);
+
+background-size:200px 200px;
+
+animation:smokeMove 10s linear infinite;
+
+}
+
+
+@keyframes smokeMove{
+
+0%{
+background-position:0 0;
+}
+
+100%{
+background-position:200px -200px;
+}
+
+}
+
+
+/* ================= SENSOR STATUS ================= */
+
+#mqStatus,
+#dhtStatus,
+#wifiStatus{
+
+font-size:22px;
+
+font-weight:bold;
+
+display:inline-block;
+
+padding:8px 15px;
+
+border-radius:12px;
+
+animation:blinkGreen 1s infinite;
+
+}
+
+
+/* GREEN BLINK */
+
+@keyframes blinkGreen{
+
+0%{
+
+box-shadow:0 0 5px lime;
+
+}
+
+50%{
+
+box-shadow:0 0 25px lime;
+
+}
+
+100%{
+
+box-shadow:0 0 5px lime;
+
+}
+
+}
+
+
+
+/* RED ALERT */
+
+.sensor-danger{
+
+background:red;
+
+color:white;
+
+animation:blinkRed 0.5s infinite;
+
+}
+
+
+@keyframes blinkRed{
+
+0%{
+
+opacity:1;
+
+box-shadow:0 0 10px red;
+
+}
+
+50%{
+
+opacity:0.4;
+
+box-shadow:0 0 30px red;
+
+}
+
+100%{
+
+opacity:1;
+
+box-shadow:0 0 10px red;
+
+}
+
+}

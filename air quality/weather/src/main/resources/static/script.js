@@ -106,6 +106,147 @@ gasValue =
 parseInt(data.gas);
 
 
+/*
+// ================= SENSOR STATUS =================
+
+const mqStatus =
+document.getElementById(
+"mqStatus");
+
+const dhtStatus =
+document.getElementById(
+"dhtStatus");
+
+const wifiStatus =
+document.getElementById(
+"wifiStatus");
+
+
+
+// MQ135 STATUS
+
+if(gasValue == -1)
+{
+
+mqStatus.innerHTML =
+"🔴 MQ135 Disconnected";
+
+mqStatus.classList.add(
+"sensor-danger");
+
+}
+else
+{
+
+mqStatus.innerHTML =
+"🟢 MQ135 Connected";
+
+mqStatus.classList.remove(
+"sensor-danger");
+
+}
+
+
+// DHT11 STATUS
+
+if(tempValue == -1 || humValue == -1)
+{
+
+dhtStatus.innerHTML =
+"🔴 DHT11 Disconnected";
+
+dhtStatus.classList.add(
+"sensor-danger");
+
+}
+else
+{
+
+dhtStatus.innerHTML =
+"🟢 DHT11 Connected";
+
+dhtStatus.classList.remove(
+"sensor-danger");
+
+}
+
+
+// WIFI STATUS
+
+wifiStatus.innerHTML =
+"🟢 WiFi Connected";
+
+wifiStatus.classList.remove(
+"sensor-danger");
+
+
+// ================= WEATHER ANIMATION =================
+
+const sun =
+document.querySelector(".sun");
+
+const rain =
+document.querySelector(".rain");
+
+const fog =
+document.querySelector(".fog");
+
+const smoke =
+document.querySelector(".smoke");
+
+
+// RESET
+
+sun.style.display = "none";
+
+rain.style.display = "none";
+
+fog.style.display = "none";
+
+smoke.style.display = "none";
+
+
+
+// SAFE AIR + NORMAL TEMP
+
+if(gasValue < 100 && humValue < 70)
+{
+
+sun.style.display = "block";
+
+}
+
+
+// HIGH HUMIDITY
+
+if(humValue > 80)
+{
+
+rain.style.display = "block";
+
+}
+
+
+// MODERATE POLLUTION
+
+if(gasValue > 100 && gasValue < 300)
+{
+
+fog.style.display = "block";
+
+}
+
+
+// DANGEROUS POLLUTION
+
+if(gasValue > 300)
+{
+
+smoke.style.display = "block";
+
+}
+*/
+
 
 
 // UPDATE HTML VALUES
