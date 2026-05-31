@@ -1,85 +1,214 @@
 <!DOCTYPE html>
+
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
 
 <meta charset="UTF-8">
 
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
 <title>AirSense AI</title>
 
-<link rel="stylesheet" th:href="@{/style.css}">
+<link rel="stylesheet"
+th:href="@{/style.css}">
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src=
+"https://cdn.jsdelivr.net/npm/chart.js">
+</script>
 
 </head>
 
 <body>
-	
-	<div class="weather-animation">
 
-	<div class="sun"></div>
+<!-- PARTICLES -->
 
-	<div class="rain"></div>
+<div id="particles"></div>
 
-	<div class="fog"></div>
 
-	<div class="smoke"></div>
+<!-- EMERGENCY OVERLAY -->
 
-	</div>
-	
-	<source
-	src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"
-	type="audio/ogg">
+<div id="emergencyOverlay">
 
-	</audio>
-	
+<h1>🚨 EMERGENCY ALERT 🚨</h1>
 
-	<div class="particles"></div>
-	
-<div class="container">
+<h2>Dangerous Air Quality Detected</h2>
 
-<h1 class="title">🌍 AirSense AI</h1>
+<p>Evacuate Area Immediately</p>
+
+</div>
 
 
 
-<p class="subtitle">
-Smart IoT Environmental Monitoring Dashboard
-</p>
+<!-- MAIN CONTAINER -->
 
-<h2 id="clock"></h2>
+<div class="dashboard">
+
+
+<!-- HEADER -->
+
+<div class="header">
+
+<div>
+
+<h1>AirSense AI</h1>
+
+<p>Smart Environmental Monitoring System</p>
+
+</div>
+
+<div class="clock"
+id="clock">
+
+Loading...
+
+</div>
+
+</div>
+
+
+
+
+<!-- SENSOR CARDS -->
 
 <div class="cards">
 
-<div class="card temp-card">
+
+<div class="card temp">
 
 <h2>🌡 Temperature</h2>
 
-<h1 id="temp" th:text="${WeatherTest.temp}">30</h1>
+<h1 id="temp"
+th:text="${WeatherTest.temp}">
+
+0
+
+</h1>
 
 <p>°C</p>
 
 </div>
 
-<div class="card hum-card">
+
+
+<div class="card hum">
 
 <h2>💧 Humidity</h2>
 
-<h1 id="hum" th:text="${WeatherTest.hum}">60</h1>
+<h1 id="hum"
+th:text="${WeatherTest.hum}">
+
+0
+
+</h1>
 
 <p>%</p>
 
 </div>
 
-<div class="card gas-card">
 
-<h2>🌫 Air Quality</h2>
 
-<h1 id="gas" th:text="${gas}">100</h1>
+<div class="card gas">
+
+<h2>💨 AQI</h2>
+
+<h1 id="gas"
+th:text="${WeatherTest.gas}">
+
+0
+
+</h1>
+
+<p>ppm</p>
+
+</div>
+
+</div>
+
+
+
+
+
+<!-- STATUS -->
+
+<div class="status-grid">
+
+
+<div class="status-card">
+
+<h3>Air Quality</h3>
+
+<p id="aqiText">
+
+Checking...
+
+</p>
+
+</div>
+
+
+
+<div class="status-card">
+
+<h3>AI Prediction</h3>
+
+<p id="prediction">
+
+Analyzing...
+
+</p>
+
+</div>
+
+
+
+<div class="status-card">
+
+<h3>Health Advice</h3>
+
+<p id="health">
+
+Analyzing...
+
+</p>
+
+</div>
+
+
+
+<div class="status-card">
+
+	<div id="sensorStatus">
+	    <div class="sensor-item"> 
+	        <span id="dhtStatus"> 🟢 DHT11 Connected </span> 
+	    </div>
+	    <div class="sensor-item"> 
+	        <span id="mqStatus"> 🟢 MQ135 Connected </span> 
+	    </div>
+	</div>
+
+</div>
+
+</div>
+
+
+
+
+
+<!-- AQI RING -->
+
+<div class="ring-section">
+
+<div class="ring">
+
+<div class="ring-inner">
+
+<h1 id="ringValue">
+
+0
+
+</h1>
 
 <p>AQI</p>
 
@@ -87,109 +216,15 @@ Smart IoT Environmental Monitoring Dashboard
 
 </div>
 
-<div id="alertBox"></div>
-
-<h2 id="aqiLevel"></h2>
-
-
-
-
-
-<!-- FLEX SECTION START -->
-
-<div class="flex-section">
-	
-
-<div class="prediction-box">
-
-<h2>🤖 AI Prediction</h2>
-
-<p id="predictionText">
-Analyzing environment...
-</p>
-
 </div>
 
 
 
-<div class="prediction-box">
-
-<h2>🧠 AI Health Recommendation</h2>
-
-<p id="healthAdvice"></p>
-
-</div>
 
 
-<div class="prediction-box">
+<!-- CHART -->
 
-<h2>🌡 Comfort Index</h2>
-
-<p id="comfortIndex"></p>
-
-</div>
-
-
-
-<div class="prediction-box">
-
-<h2>🧪 Pollution Source Detection</h2>
-
-<p id="pollutionSource"></p>
-
-</div>
-
-<div class="prediction-box">
-
-<h2>🔋 Sensor Health Monitor</h2>
-
-<p>
-
-<span id="mqStatus">
-
-🟢 MQ135 Connected
-
-</span>
-
-<br><br>
-
-<span id="dhtStatus">
-
-🟢 DHT11 Connected
-
-</span>
-
-<br><br>
-
-<span id="wifiStatus">
-
-🟢 WiFi Connected
-
-</span>
-
-</p>
-
-</div>
-
-<div class="prediction-box">
-
-<h2>📊 AQI Gauge</h2>
-
-<div class="gauge">
-
-<div class="gauge-fill"
-id="gaugeFill"></div>
-
-<div class="gauge-cover"
-id="gaugeText">0</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="chart-box">
+<div class="chart-container">
 
 <canvas id="airChart"></canvas>
 
@@ -197,7 +232,13 @@ id="gaugeText">0</div>
 
 </div>
 
+
+
+
+<!-- SCRIPT -->
+
 <script th:src="@{/script.js}"></script>
 
 </body>
+
 </html>

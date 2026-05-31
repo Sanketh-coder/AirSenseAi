@@ -1,28 +1,3 @@
-// INITIAL VALUES
-
-let tempValue =
-parseInt(document.getElementById("temp").innerText);
-
-let humValue =
-parseInt(document.getElementById("hum").innerText);
-
-let gasValue =
-parseInt(document.getElementById("gas").innerText);
-
-
-// HISTORY STORAGE
-
-let historyLabels = [];
-
-let historyGas = [];
-
-
-
-
-
-
-
-
 // LIVE CLOCK
 
 setInterval(()=>{
@@ -36,41 +11,82 @@ new Date().toLocaleString();
 
 
 
+// PARTICLES
+
+function createParticle()
+{
+
+const particle =
+document.createElement("div");
+
+particle.classList.add("particle");
+
+let size =
+Math.random()*10+5;
+
+particle.style.width =
+size+"px";
+
+particle.style.height =
+size+"px";
+
+particle.style.left =
+Math.random()*100+"vw";
+
+particle.style.animationDuration =
+Math.random()*10+5+"s";
+
+document
+.getElementById("particles")
+.appendChild(particle);
+
+setTimeout(()=>{
+
+particle.remove();
+
+},15000);
+
+}
+
+
+setInterval(createParticle,300);
+
+
+
 
 // CHART
 
 const ctx =
-document.getElementById('airChart');
+document.getElementById("airChart");
 
-const airChart = new Chart(ctx, {
+const chart =
+new Chart(ctx,{
 
-type: 'line',
+type:'line',
 
-data: {
+data:{
 
-labels: historyLabels,
+labels:[],
 
-datasets: [{
+datasets:[{
 
-label: 'Live AQI History',
+label:'AQI History',
 
-data: historyGas,
+data:[],
 
-borderColor: 'green',
+borderColor:'#ef4444',
 
-backgroundColor: 'green',
-
-borderWidth: 3,
+backgroundColor:'#ef4444',
 
 tension:0.4,
 
-fill:false
+borderWidth:3
 
 }]
 
 },
 
-options: {
+options:{
 
 responsive:true
 
@@ -81,535 +97,204 @@ responsive:true
 
 
 
-
-
-// LIVE AJAX UPDATE
+// LIVE UPDATE
 
 setInterval(()=>{
 
 fetch('/live-data')
 
-.then(response => response.json())
+.then(res=>res.json())
 
-.then(data => {
+.then(data=>{
 
 
-// SENSOR VALUES
-
-tempValue =
+let temp =
 parseInt(data.temp);
 
-humValue =
+let hum =
 parseInt(data.hum);
 
-gasValue =
+let gas =
 parseInt(data.gas);
 
 
-/*
-// ================= SENSOR STATUS =================
 
-const mqStatus =
-document.getElementById(
-"mqStatus");
+// UPDATE VALUES
 
-const dhtStatus =
-document.getElementById(
-"dhtStatus");
+// SAFE DISPLAY VALUES 
+document.getElementById("temp") .innerHTML = (temp == -1) ? "--" : temp; 
+document.getElementById("hum") .innerHTML = (hum == -1) ? "--" : hum;
 
-const wifiStatus =
-document.getElementById(
-"wifiStatus");
+// SAFE AQI DISPLAY 
+document.getElementById("gas") .innerHTML = (gas == -1) ? "--" : gas;
+
+document.getElementById("ringValue") .innerHTML = (gas == -1) ? "--" : gas;
 
 
 
-// MQ135 STATUS
 
-if(gasValue == -1)
-{
+// AQI STATUS
 
-mqStatus.innerHTML =
-"🔴 MQ135 Disconnected";
+let aqiText =
+document.getElementById("aqiText");
 
-mqStatus.classList.add(
-"sensor-danger");
+let prediction =
+document.getElementById("prediction");
 
-}
-else
-{
+let health =
+document.getElementById("health");
 
-mqStatus.innerHTML =
-"🟢 MQ135 Connected";
+let sensor =
+document.getElementById("sensorStatus");
 
-mqStatus.classList.remove(
-"sensor-danger");
-
-}
-
-
-// DHT11 STATUS
-
-if(tempValue == -1 || humValue == -1)
-{
-
-dhtStatus.innerHTML =
-"🔴 DHT11 Disconnected";
-
-dhtStatus.classList.add(
-"sensor-danger");
-
-}
-else
-{
-
-dhtStatus.innerHTML =
-"🟢 DHT11 Connected";
-
-dhtStatus.classList.remove(
-"sensor-danger");
-
-}
-
-
-// WIFI STATUS
-
-wifiStatus.innerHTML =
-"🟢 WiFi Connected";
-
-wifiStatus.classList.remove(
-"sensor-danger");
-
-
-// ================= WEATHER ANIMATION =================
-
-const sun =
-document.querySelector(".sun");
-
-const rain =
-document.querySelector(".rain");
-
-const fog =
-document.querySelector(".fog");
-
-const smoke =
-document.querySelector(".smoke");
-
-
-// RESET
-
-sun.style.display = "none";
-
-rain.style.display = "none";
-
-fog.style.display = "none";
-
-smoke.style.display = "none";
+let ring =
+document.querySelector(".ring");
 
 
 
-// SAFE AIR + NORMAL TEMP
 
-if(gasValue < 100 && humValue < 70)
-{
+// ================= SENSOR STATUS ================= 
+let dhtStatus = document.getElementById( "dhtStatus");
+let mqStatus = document.getElementById( "mqStatus");
+  
 
-sun.style.display = "block";
+// DHT11 STATUS 
 
+if(temp == -1 || hum == -1) { 
+    dhtStatus.innerHTML = "🔴 DHT11 Connection Lost"; 
+    dhtStatus.className = "sensor-offline"; 
+} else { 
+    dhtStatus.innerHTML = "🟢 DHT11 Connected"; 
+    dhtStatus.className = "sensor-online"; 
+} 
+    
+
+// MQ135 STATUS  
+    
+if(gas == -1) { 
+    mqStatus.innerHTML = "🔴 MQ135 Connection Lost"; 
+    mqStatus.className = "sensor-offline"; 
+} else { 
+    mqStatus.innerHTML = "🟢 MQ135 Connected"; 
+    mqStatus.className = "sensor-online"; 
+} 
+
+
+
+// AQI LOGIC
+
+if(gas == '--') { 
+	aqi.innerHTML = 
+	"⚠ AQI Sensor Offline";
+	
+	prediction.innerHTML = 
+	"Unable To Analyze Environment";
+	 
+	health.innerHTML = 
+	"Sensor Connection Lost";
+	 
+	ring.style.background = 
+	"conic-gradient(gray 360deg,#1e293b 0deg)";
+	 
+	ring.style.boxShadow = 
+	"0 0 25px rgba(150,150,150,0.4)"; 
+	overlay.style.display = 
+	"none"; 
 }
 
 
-// HIGH HUMIDITY
-
-if(humValue > 80)
+else if(gas<100)
 {
 
-rain.style.display = "block";
+aqiText.innerHTML =
+"🟢 Safe Air";
 
-}
+prediction.innerHTML =
+"Environment Stable";
 
+health.innerHTML =
+"Fresh Air";
 
-// MODERATE POLLUTION
-
-if(gasValue > 100 && gasValue < 300)
-{
-
-fog.style.display = "block";
-
-}
-
-
-// DANGEROUS POLLUTION
-
-if(gasValue > 300)
-{
-
-smoke.style.display = "block";
-
-}
-*/
-
-
-
-// UPDATE HTML VALUES
-
-document.getElementById("temp")
-.innerHTML = tempValue;
-
-document.getElementById("hum")
-.innerHTML = humValue;
-
-document.getElementById("gas")
-.innerHTML = gasValue;
-
-
-
-
-
-
-// ALERT SYSTEM
-
-const alertBox =
-document.getElementById("alertBox");
-
-
-if(gasValue > 500)
-{
-
-alertBox.innerHTML =
-"🚨 Dangerous Air Quality Detected";
-
-alertBox.className =
-"danger";
+ring.style.background =
+"conic-gradient(lime 120deg,#1e293b 0deg)";
 
 document.body.style.background =
-"linear-gradient(135deg,#7f1d1d,#450a0a)";
+"linear-gradient(135deg,#020617,#0f172a)";
+
+document
+.getElementById("emergencyOverlay")
+.style.display="none";
 
 }
-else if(gasValue > 200)
+else if(gas<300)
 {
 
-alertBox.innerHTML =
-"⚠ Moderate Pollution Detected";
+aqiText.innerHTML =
+"🟠 Moderate Pollution";
 
-alertBox.className =
-"warning";
+prediction.innerHTML =
+"Pollution Increasing";
+
+health.innerHTML =
+"Wear Mask";
+
+ring.style.background =
+"conic-gradient(orange 240deg,#1e293b 0deg)";
 
 document.body.style.background =
-"linear-gradient(135deg,#92400e,#451a03)";
+"linear-gradient(135deg,#451a03,#78350f)";
 
+document
+.getElementById("emergencyOverlay")
+.style.display="none";
 
 }
 else
 {
 
-alertBox.innerHTML =
-"✅ Air Quality Good";
+aqiText.innerHTML =
+"🔴 Dangerous Air";
 
-alertBox.className =
-"safe";
+prediction.innerHTML =
+"Hazardous AQI Rising";
+
+health.innerHTML =
+"Avoid Area Immediately";
+
+ring.style.background =
+"conic-gradient(red 360deg,#1e293b 0deg)";
 
 document.body.style.background =
-"linear-gradient(135deg,#065f46,#022c22)";
+"linear-gradient(135deg,#450a0a,#7f1d1d)";
 
-
-}
-
-
-
-
-
-// AQI LEVEL
-
-const aqiLevel =
-document.getElementById("aqiLevel");
-
-
-if(gasValue <= 100)
-{
-
-aqiLevel.innerHTML =
-"🟢 GOOD";
+document
+.getElementById("emergencyOverlay")
+.style.display="flex";
 
 }
-else if(gasValue <= 300)
-{
-
-aqiLevel.innerHTML =
-"🟠 MODERATE";
-
-}
-else if(gasValue <= 500)
-{
-
-aqiLevel.innerHTML =
-"🔴 POOR";
-
-}
-else
-{
-
-aqiLevel.innerHTML =
-"🚨 DANGEROUS";
-
-}
-
-
-
-
-
-// AI PREDICTION
-
-const predictionText =
-document.getElementById("predictionText");
-
-
-if(gasValue > 500)
-{
-
-predictionText.innerHTML =
-"Hazardous air increasing rapidly.";
-
-}
-else if(gasValue > 200)
-{
-
-predictionText.innerHTML =
-"Pollution level increasing gradually.";
-
-}
-else
-{
-
-predictionText.innerHTML =
-"Environment remains stable.";
-
-}
-
-
-
-
-
-// HEALTH ADVICE
-
-const healthAdvice =
-document.getElementById("healthAdvice");
-
-
-if(gasValue < 200)
-{
-
-healthAdvice.innerHTML =
-"✅ Fresh Air";
-
-}
-else if(gasValue < 500)
-{
-
-healthAdvice.innerHTML =
-"😷 Wear Mask Recommended";
-
-}
-else
-{
-
-healthAdvice.innerHTML =
-"⚠ Avoid Area Immediately";
-
-}
-
-
-
-
-
-// COMFORT INDEX
-
-const comfortIndex =
-document.getElementById("comfortIndex");
-
-
-if(tempValue < 35 && humValue < 70)
-{
-
-comfortIndex.innerHTML =
-"😊 Comfortable Environment";
-
-}
-else
-{
-
-comfortIndex.innerHTML =
-"🥵 Hot & Humid";
-
-}
-
-
-
-
-
-// POLLUTION SOURCE
-
-const pollutionSource =
-document.getElementById("pollutionSource");
-
-
-if(gasValue > 500)
-{
-
-pollutionSource.innerHTML =
-"🔥 Smoke / Chemical Gas";
-
-}
-else
-{
-
-pollutionSource.innerHTML =
-"✅ No Harmful Pollution";
-
-}
-
-
-
-
-
-// AQI GAUGE
-
-const gaugeFill =
-document.getElementById("gaugeFill");
-
-const gaugeText =
-document.getElementById("gaugeText");
-
-
-let degree = gasValue;
-
-if(degree > 100)
-{
-degree = 100;
-}
-
-
-let gaugeColor = "green";
-
-
-if(gasValue > 500)
-{
-gaugeColor = "red";
-}
-else if(gasValue > 200)
-{
-gaugeColor = "orange";
-}
-
-
-gaugeFill.style.background =
-`conic-gradient(${gaugeColor}
-${degree * 3.6}deg,#222 0deg)`;
-
-
-gaugeText.innerHTML =
-gasValue;
-
-
-
-
-
-
-// LIVE HISTORY STORAGE
-
-let currentTime =
-new Date().toLocaleTimeString();
-
-historyLabels.push(currentTime);
-
-historyGas.push(gasValue);
-
-
-
-
-// LIMIT GRAPH DATA
-
-if(historyLabels.length > 15)
-{
-
-historyLabels.shift();
-
-historyGas.shift();
-
-}
-
 
 
 
 // UPDATE CHART
 
-airChart.data.labels =
-historyLabels;
+chart.data.labels.push(
+new Date().toLocaleTimeString()
+);
 
-airChart.data.datasets[0].data =
-historyGas;
-
-airChart.data.datasets[0].borderColor =
-gaugeColor;
-
-airChart.data.datasets[0].backgroundColor =
-gaugeColor;
-
-airChart.update();
+chart.data.datasets[0].data.push(gas);
 
 
-
-
-
-
-// DAILY POLLUTION ANALYSIS
-
-const dailyAnalysis =
-document.getElementById(
-"dailyAnalysis");
-
-let avgGas = 0;
-
-for(let i=0;
-i<historyGas.length;
-i++)
-{
-avgGas += historyGas[i];
-}
-
-avgGas =
-avgGas / historyGas.length;
-
-
-if(avgGas > 500)
+if(chart.data.labels.length>15)
 {
 
-dailyAnalysis.innerHTML =
-"🚨 Dangerous pollution detected today.";
+chart.data.labels.shift();
 
-}
-else if(avgGas > 200)
-{
-
-dailyAnalysis.innerHTML =
-"⚠ Moderate pollution observed today.";
-
-}
-else
-{
-
-dailyAnalysis.innerHTML =
-"✅ Air quality remained mostly safe.";
+chart.data.datasets[0].data.shift();
 
 }
 
-
-
-})
-
-.catch(error => {
-
-console.log(error);
+chart.update();
 
 });
-
 
 },3000);
