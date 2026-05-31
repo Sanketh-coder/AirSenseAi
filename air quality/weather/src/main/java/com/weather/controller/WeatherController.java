@@ -1,5 +1,13 @@
 package com.weather.controller;
 
+import java.util.List; 
+import java.time.LocalDateTime; 
+import java.time.format.DateTimeFormatter; 
+import com.weather.entity.PollutionHistory; 
+import com.weather.repository.PollutionHistoryRepository;
+
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +30,9 @@ import com.weather.entity.WeatherTest;
 public class WeatherController {
 	@Autowired
 	private WeatherRepository wrepo;
+	
+	@Autowired 
+	private PollutionHistoryRepository prepo;
 	
 	@GetMapping("weatherapp/{temp1}/{hum1}/{gas}")
 	public String registerForm(@PathVariable("temp1")String   temp1, @PathVariable("hum1")String  hum1,@PathVariable("gas")String  gas )
@@ -47,6 +58,26 @@ public class WeatherController {
 		 
 		 
 		 wrepo.save(WeatherTest);
+		 
+		 
+		 //SAVE HISTORY
+		 PollutionHistory history = new PollutionHistory(); 
+		 history.setTemperature(temp1); 
+		 history.setHumidity(hum1); 
+		 history.setGas(gas); 
+		 
+		 // DATE TIME 
+		 LocalDateTime now = LocalDateTime.now(); 
+		 DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("EEEE"); 
+		 DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy"); 
+		 DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("hh:mm:ss a"); 
+		 history.setDayName( now.format(dayFormat)); 
+		 history.setDateValue( now.format(dateFormat)); 
+		 history.setTimeValue( now.format(timeFormat)); 
+		 prepo.save(history);
+		 
+		 
+		 
 		 return"/weather";
 	}
 	
@@ -153,5 +184,13 @@ public class WeatherController {
         return data;
 
     }
+    
+    
+    @GetMapping("/weekly-data") 
+    @ResponseBody 
+    public List<PollutionHistory> 
+    weeklyData() { 
+    	return prepo.getWeeklyAverage(); 
+    	}
 
 }

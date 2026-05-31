@@ -225,6 +225,12 @@ document
 .getElementById("emergencyOverlay")
 .style.display="none";
 
+// STOP EMERGENCY VOICE
+
+speechSynthesis.cancel();
+
+window.voiceAlertPlaying = false;
+
 }
 else if(gas<300)
 {
@@ -248,6 +254,10 @@ document
 .getElementById("emergencyOverlay")
 .style.display="none";
 
+speechSynthesis.cancel();
+
+window.voiceAlertPlaying = false;
+
 }
 else
 {
@@ -270,6 +280,62 @@ document.body.style.background =
 document
 .getElementById("emergencyOverlay")
 .style.display="flex";
+
+// ================= EMERGENCY HUMAN VOICE =================
+
+if(!window.voiceAlertPlaying)
+{
+
+window.voiceAlertPlaying = true;
+
+
+// STOP OLD VOICE
+
+speechSynthesis.cancel();
+
+
+// CREATE HUMAN VOICE
+
+let emergencyVoice =
+new SpeechSynthesisUtterance();
+
+emergencyVoice.text =
+
+"Emergency Alert. Dangerous air quality detected. Please wear a mask immediately and avoid this area.";
+
+emergencyVoice.volume = 1;
+
+emergencyVoice.rate = 0.9;
+
+emergencyVoice.pitch = 0.8;
+
+
+// SELECT BEST HUMAN VOICE
+
+let voices =
+speechSynthesis.getVoices();
+
+emergencyVoice.voice =
+voices.find(v =>
+v.name.includes("Google"))
+|| voices[0];
+
+
+// SPEAK VOICE
+
+speechSynthesis.speak(
+emergencyVoice);
+
+
+// RESET
+
+emergencyVoice.onend = () => {
+
+window.voiceAlertPlaying = false;
+
+};
+
+}
 
 }
 
@@ -298,3 +364,283 @@ chart.update();
 });
 
 },3000);
+
+
+
+// ================= FINAL LIVE HISTORY BAR GRAPH =================
+
+let weeklyChart;
+
+
+// LOAD GRAPH
+
+function loadWeeklyGraph()
+{
+
+fetch('/weekly-data')
+
+.then(response => response.json())
+
+.then(data => {
+
+
+let labels = [];
+
+let gasValues = [];
+
+let colors = [];
+
+
+// CORRECT ORDER
+
+data.reverse();
+
+
+
+// GET VALUES
+
+data.forEach(item => {
+
+
+labels.push(item.dayName);
+
+
+let gas =
+parseInt(item.gas);
+
+
+gasValues.push(gas);
+
+
+
+// COLORS
+
+if(gas < 100)
+{
+
+colors.push("#00ff00");
+
+}
+else if(gas < 300)
+{
+
+colors.push("#ffaa00");
+
+}
+else
+{
+
+colors.push("#ff0000");
+
+}
+
+});
+
+
+
+
+// DESTROY OLD GRAPH
+
+if(weeklyChart)
+{
+
+weeklyChart.destroy();
+
+}
+
+
+
+
+// CREATE BAR GRAPH
+
+const ctx =
+document.getElementById(
+"weeklyChart");
+
+
+weeklyChart =
+new Chart(ctx, {
+
+type:'bar',
+
+data:{
+
+labels:labels,
+
+datasets:[{
+
+label:'AQI History',
+
+data:gasValues,
+
+backgroundColor:colors,
+
+borderRadius:10,
+
+borderWidth:1
+
+}]
+
+},
+
+options:{
+
+responsive:true,
+
+maintainAspectRatio:false,
+
+responsive:true,
+
+animation:true,
+
+plugins:{
+
+legend:{
+
+labels:{
+
+color:'white',
+
+font:{
+
+size:16
+
+}
+
+}
+
+}
+
+},
+
+scales:{
+
+x:{
+
+ticks:{
+
+color:'white',
+
+maxRotation:90,
+
+minRotation:45
+
+},
+
+grid:{
+
+color:
+"rgba(255,255,255,0.05)"
+
+}
+
+},
+
+y:{
+
+ticks:{
+
+color:'white'
+
+},
+
+grid:{
+
+color:
+"rgba(255,255,255,0.05)"
+
+}
+
+}
+
+}
+
+}
+
+});
+
+
+
+
+
+
+// ================= AI ANALYSIS =================
+
+let bestAQI = 99999;
+
+let worstAQI = 0;
+
+let bestDate = "";
+
+let worstDate = "";
+
+
+data.forEach(item => {
+
+let gas =
+parseInt(item.gas);
+
+
+if(gas < bestAQI)
+{
+
+bestAQI = gas;
+
+bestDate =
+item.dateValue;
+
+}
+
+
+if(gas > worstAQI)
+{
+
+worstAQI = gas;
+
+worstDate =
+item.dateValue;
+
+}
+
+});
+
+
+
+document.getElementById(
+"weeklyAnalysis")
+
+.innerHTML =
+
+"🟢 Freshest Air: " +
+
+bestDate +
+
+" (" + bestAQI + ")<br><br>" +
+
+"🔴 Most Dangerous AQI: " +
+
+worstDate +
+
+" (" + worstAQI + ")";
+
+});
+
+}
+
+
+
+
+// FIRST LOAD
+
+loadWeeklyGraph();
+
+
+
+
+// AUTO UPDATE EVERY 5 SECONDS
+
+setInterval(() => {
+
+loadWeeklyGraph();
+
+},5000);
