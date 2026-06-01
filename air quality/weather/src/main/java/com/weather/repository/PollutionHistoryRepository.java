@@ -18,6 +18,6 @@ extends JpaRepository<PollutionHistory,Integer>{
 nativeQuery = true)
 
 List<PollutionHistory>
-getWeeklyAverage();
+findTop7ByOrderByIdDesc();
 
 }

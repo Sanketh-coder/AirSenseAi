@@ -186,11 +186,15 @@ public class WeatherController {
     }
     
     
-    @GetMapping("/weekly-data") 
-    @ResponseBody 
-    public List<PollutionHistory> 
-    weeklyData() { 
-    	return prepo.getWeeklyAverage(); 
-    	}
+    @GetMapping("/weekly-data")
 
+    @ResponseBody
+
+    public List<PollutionHistory>
+    weeklyData()
+    {
+
+    return prepo.findTop7ByOrderByIdDesc();
+
+    }
 }

@@ -1,4 +1,16 @@
-// LIVE CLOCK
+// ================= ENABLE HUMAN VOICE =================
+
+window.speechSynthesis.onvoiceschanged =
+function()
+{
+
+window.speechSynthesis.getVoices();
+
+};
+
+
+
+// ================= LIVE CLOCK =================
 
 setInterval(()=>{
 
@@ -11,7 +23,7 @@ new Date().toLocaleString();
 
 
 
-// PARTICLES
+// ================= PARTICLES =================
 
 function createParticle()
 {
@@ -54,7 +66,7 @@ setInterval(createParticle,300);
 
 
 
-// CHART
+// ================= LIVE LINE CHART =================
 
 const ctx =
 document.getElementById("airChart");
@@ -88,7 +100,9 @@ borderWidth:3
 
 options:{
 
-responsive:true
+responsive:true,
+
+maintainAspectRatio:false
 
 }
 
@@ -97,7 +111,7 @@ responsive:true
 
 
 
-// LIVE UPDATE
+// ================= LIVE SENSOR UPDATE =================
 
 setInterval(()=>{
 
@@ -119,21 +133,31 @@ parseInt(data.gas);
 
 
 
-// UPDATE VALUES
-
-// SAFE DISPLAY VALUES 
-document.getElementById("temp") .innerHTML = (temp == -1) ? "--" : temp; 
-document.getElementById("hum") .innerHTML = (hum == -1) ? "--" : hum;
-
-// SAFE AQI DISPLAY 
-document.getElementById("gas") .innerHTML = (gas == -1) ? "--" : gas;
-
-document.getElementById("ringValue") .innerHTML = (gas == -1) ? "--" : gas;
+// ================= UPDATE SENSOR VALUES =================
 
 
+document.getElementById("temp")
+.innerHTML =
+(temp == -1) ? "--" : temp;
 
 
-// AQI STATUS
+document.getElementById("hum")
+.innerHTML =
+(hum == -1) ? "--" : hum;
+
+
+document.getElementById("gas")
+.innerHTML =
+(gas == -1) ? "--" : gas;
+
+
+document.getElementById("ringValue")
+.innerHTML =
+(gas == -1) ? "--" : gas;
+
+
+
+// ================= AQI ELEMENTS =================
 
 let aqiText =
 document.getElementById("aqiText");
@@ -144,67 +168,110 @@ document.getElementById("prediction");
 let health =
 document.getElementById("health");
 
-let sensor =
-document.getElementById("sensorStatus");
-
 let ring =
 document.querySelector(".ring");
 
+let overlay =
+document.getElementById("emergencyOverlay");
 
 
 
-// ================= SENSOR STATUS ================= 
-let dhtStatus = document.getElementById( "dhtStatus");
-let mqStatus = document.getElementById( "mqStatus");
-  
+// ================= SENSOR STATUS =================
 
-// DHT11 STATUS 
+let dhtStatus =
+document.getElementById("dhtStatus");
 
-if(temp == -1 || hum == -1) { 
-    dhtStatus.innerHTML = "🔴 DHT11 Connection Lost"; 
-    dhtStatus.className = "sensor-offline"; 
-} else { 
-    dhtStatus.innerHTML = "🟢 DHT11 Connected"; 
-    dhtStatus.className = "sensor-online"; 
-} 
-    
-
-// MQ135 STATUS  
-    
-if(gas == -1) { 
-    mqStatus.innerHTML = "🔴 MQ135 Connection Lost"; 
-    mqStatus.className = "sensor-offline"; 
-} else { 
-    mqStatus.innerHTML = "🟢 MQ135 Connected"; 
-    mqStatus.className = "sensor-online"; 
-} 
+let mqStatus =
+document.getElementById("mqStatus");
 
 
 
-// AQI LOGIC
+// DHT11 STATUS
 
-if(gas == '--') { 
-	aqi.innerHTML = 
-	"⚠ AQI Sensor Offline";
-	
-	prediction.innerHTML = 
-	"Unable To Analyze Environment";
-	 
-	health.innerHTML = 
-	"Sensor Connection Lost";
-	 
-	ring.style.background = 
-	"conic-gradient(gray 360deg,#1e293b 0deg)";
-	 
-	ring.style.boxShadow = 
-	"0 0 25px rgba(150,150,150,0.4)"; 
-	overlay.style.display = 
-	"none"; 
+if(temp == -1 || hum == -1)
+{
+
+    dhtStatus.innerHTML =
+    "🔴 DHT11 Connection Lost";
+
+    dhtStatus.className =
+    "sensor-offline";
+
+}
+else
+{
+
+    dhtStatus.innerHTML =
+    "🟢 DHT11 Connected";
+
+    dhtStatus.className =
+    "sensor-online";
+
 }
 
 
-else if(gas<100)
+
+// MQ135 STATUS
+
+if(gas == -1)
 {
+
+    mqStatus.innerHTML =
+    "🔴 MQ135 Connection Lost";
+
+    mqStatus.className =
+    "sensor-offline";
+
+}
+else
+{
+
+    mqStatus.innerHTML =
+    "🟢 MQ135 Connected";
+
+    mqStatus.className =
+    "sensor-online";
+
+}
+
+
+
+// ================= SENSOR OFFLINE =================
+
+if(gas == -1)
+{
+
+aqiText.innerHTML =
+"⚠ AQI Sensor Offline";
+
+prediction.innerHTML =
+"Unable To Analyze Environment";
+
+health.innerHTML =
+"Sensor Connection Lost";
+
+ring.style.background =
+"conic-gradient(gray 360deg,#1e293b 0deg)";
+
+ring.style.boxShadow =
+"0 0 25px rgba(150,150,150,0.4)";
+
+overlay.style.display =
+"none";
+
+speechSynthesis.cancel();
+
+window.voiceAlertPlaying = false;
+
+}
+
+
+
+// ================= SAFE AIR =================
+
+else if(gas < 100)
+{
+
 
 aqiText.innerHTML =
 "🟢 Safe Air";
@@ -218,22 +285,33 @@ health.innerHTML =
 ring.style.background =
 "conic-gradient(lime 120deg,#1e293b 0deg)";
 
+ring.style.boxShadow =
+"0 0 25px lime";
+
+
 document.body.style.background =
 "linear-gradient(135deg,#020617,#0f172a)";
 
-document
-.getElementById("emergencyOverlay")
-.style.display="none";
 
-// STOP EMERGENCY VOICE
+overlay.style.display =
+"none";
+
+
+// STOP VOICE
 
 speechSynthesis.cancel();
 
 window.voiceAlertPlaying = false;
 
 }
-else if(gas<300)
+
+
+
+// ================= MODERATE AIR =================
+
+else if(gas < 300)
 {
+
 
 aqiText.innerHTML =
 "🟠 Moderate Pollution";
@@ -247,20 +325,31 @@ health.innerHTML =
 ring.style.background =
 "conic-gradient(orange 240deg,#1e293b 0deg)";
 
+ring.style.boxShadow =
+"0 0 25px orange";
+
+
 document.body.style.background =
 "linear-gradient(135deg,#451a03,#78350f)";
 
-document
-.getElementById("emergencyOverlay")
-.style.display="none";
+
+overlay.style.display =
+"none";
+
 
 speechSynthesis.cancel();
 
 window.voiceAlertPlaying = false;
 
 }
+
+
+
+// ================= DANGEROUS AIR =================
+
 else
 {
+
 
 aqiText.innerHTML =
 "🔴 Dangerous Air";
@@ -274,14 +363,20 @@ health.innerHTML =
 ring.style.background =
 "conic-gradient(red 360deg,#1e293b 0deg)";
 
+ring.style.boxShadow =
+"0 0 25px red";
+
+
 document.body.style.background =
 "linear-gradient(135deg,#450a0a,#7f1d1d)";
 
-document
-.getElementById("emergencyOverlay")
-.style.display="flex";
 
-// ================= EMERGENCY HUMAN VOICE =================
+overlay.style.display =
+"flex";
+
+
+
+// ================= FINAL EMERGENCY VOICE =================
 
 if(!window.voiceAlertPlaying)
 {
@@ -291,39 +386,58 @@ window.voiceAlertPlaying = true;
 
 // STOP OLD VOICE
 
-speechSynthesis.cancel();
+window.speechSynthesis.cancel();
 
 
-// CREATE HUMAN VOICE
+// CREATE VOICE
 
 let emergencyVoice =
 new SpeechSynthesisUtterance();
 
 emergencyVoice.text =
 
-"Emergency Alert. Dangerous air quality detected. Please wear a mask immediately and avoid this area.";
+"Emergency Alert. Dangerous air quality detected. Please wear a mask immediately.";
 
 emergencyVoice.volume = 1;
 
 emergencyVoice.rate = 0.9;
 
-emergencyVoice.pitch = 0.8;
+emergencyVoice.pitch = 1;
+
+emergencyVoice.lang = "en-US";
 
 
-// SELECT BEST HUMAN VOICE
+// LOAD HUMAN VOICES
 
 let voices =
-speechSynthesis.getVoices();
+window.speechSynthesis.getVoices();
+
+
+// SELECT BEST VOICE
+
+for(let i=0;i<voices.length;i++)
+{
+
+if(
+voices[i].name.includes("Google")
+||
+voices[i].name.includes("Microsoft")
+)
+{
 
 emergencyVoice.voice =
-voices.find(v =>
-v.name.includes("Google"))
-|| voices[0];
+voices[i];
+
+break;
+
+}
+
+}
 
 
-// SPEAK VOICE
+// SPEAK
 
-speechSynthesis.speak(
+window.speechSynthesis.speak(
 emergencyVoice);
 
 
@@ -341,7 +455,7 @@ window.voiceAlertPlaying = false;
 
 
 
-// UPDATE CHART
+// ================= LIVE LINE GRAPH =================
 
 chart.data.labels.push(
 new Date().toLocaleTimeString()
@@ -350,7 +464,7 @@ new Date().toLocaleTimeString()
 chart.data.datasets[0].data.push(gas);
 
 
-if(chart.data.labels.length>15)
+if(chart.data.labels.length > 15)
 {
 
 chart.data.labels.shift();
@@ -367,49 +481,101 @@ chart.update();
 
 
 
-// ================= FINAL LIVE HISTORY BAR GRAPH =================
+
+// ================= FINAL INDUSTRY WEEKLY GRAPH =================
 
 let weeklyChart;
 
-
-// LOAD GRAPH
 
 function loadWeeklyGraph()
 {
 
 fetch('/weekly-data')
 
-.then(response => response.json())
+.then(res=>res.json())
 
-.then(data => {
-
-
-let labels = [];
-
-let gasValues = [];
-
-let colors = [];
+.then(data=>{
 
 
-// CORRECT ORDER
+// FIXED WEEK DAYS
 
-data.reverse();
+let labels = [
+
+"Sunday",
+
+"Monday",
+
+"Tuesday",
+
+"Wednesday",
+
+"Thursday",
+
+"Friday",
+
+"Saturday"
+
+];
 
 
 
-// GET VALUES
+// DEFAULT VALUES
 
-data.forEach(item => {
+let values = [0,0,0,0,0,0,0];
 
 
-labels.push(item.dayName);
+
+// DEFAULT COLORS
+
+let colors = [
+
+"#374151",
+
+"#374151",
+
+"#374151",
+
+"#374151",
+
+"#374151",
+
+"#374151",
+
+"#374151"
+
+];
+
+
+
+
+
+// MAP DATABASE DATA TO DAYS
+
+data.forEach(item=>{
 
 
 let gas =
-parseInt(item.gas);
+parseInt(item.gas || 0);
 
 
-gasValues.push(gas);
+let dayIndex =
+labels.indexOf(item.dayName);
+
+
+
+if(dayIndex != -1)
+{
+
+
+// STORE HIGHEST AQI OF DAY
+
+if(gas > values[dayIndex])
+{
+
+values[dayIndex] = gas;
+
+}
+
 
 
 
@@ -418,23 +584,30 @@ gasValues.push(gas);
 if(gas < 100)
 {
 
-colors.push("#00ff00");
+colors[dayIndex] =
+"#00ff00";
 
 }
 else if(gas < 300)
 {
 
-colors.push("#ffaa00");
+colors[dayIndex] =
+"#ffaa00";
 
 }
 else
 {
 
-colors.push("#ff0000");
+colors[dayIndex] =
+"#ff0000";
+
+}
 
 }
 
 });
+
+
 
 
 
@@ -451,37 +624,44 @@ weeklyChart.destroy();
 
 
 
-// CREATE BAR GRAPH
+// CREATE GRAPH
 
-const ctx =
+const weeklyCtx =
 document.getElementById(
 "weeklyChart");
 
 
+
 weeklyChart =
-new Chart(ctx, {
+new Chart(weeklyCtx,{
 
 type:'bar',
+
 
 data:{
 
 labels:labels,
 
+
 datasets:[{
 
-label:'AQI History',
+label:'Weekly AQI',
 
-data:gasValues,
+data:values,
 
 backgroundColor:colors,
 
-borderRadius:10,
+borderRadius:12,
 
-borderWidth:1
+borderWidth:1,
+
+barThickness:40
 
 }]
 
 },
+
+
 
 options:{
 
@@ -489,15 +669,27 @@ responsive:true,
 
 maintainAspectRatio:false,
 
-responsive:true,
-
 animation:true,
+
 
 plugins:{
 
 legend:{
 
-labels:{
+display:false
+
+}
+
+},
+
+
+
+scales:{
+
+
+x:{
+
+ticks:{
 
 color:'white',
 
@@ -506,24 +698,6 @@ font:{
 size:16
 
 }
-
-}
-
-}
-
-},
-
-scales:{
-
-x:{
-
-ticks:{
-
-color:'white',
-
-maxRotation:90,
-
-minRotation:45
 
 },
 
@@ -536,7 +710,11 @@ color:
 
 },
 
+
+
 y:{
+
+beginAtZero:true,
 
 ticks:{
 
@@ -564,40 +742,49 @@ color:
 
 
 
-// ================= AI ANALYSIS =================
 
-let bestAQI = 99999;
+// ================= FINAL AI ANALYSIS =================
 
-let worstAQI = 0;
+let minAQI = 99999;
 
-let bestDate = "";
+let maxAQI = 0;
 
-let worstDate = "";
+let freshDay = "";
+
+let dangerDay = "";
 
 
-data.forEach(item => {
+
+data.forEach(item=>{
+
 
 let gas =
-parseInt(item.gas);
+parseInt(item.gas || 0);
 
 
-if(gas < bestAQI)
+
+// MIN AQI
+
+if(gas < minAQI)
 {
 
-bestAQI = gas;
+minAQI = gas;
 
-bestDate =
+freshDay =
 item.dateValue;
 
 }
 
 
-if(gas > worstAQI)
+
+// MAX AQI
+
+if(gas > maxAQI)
 {
 
-worstAQI = gas;
+maxAQI = gas;
 
-worstDate =
+dangerDay =
 item.dateValue;
 
 }
@@ -605,27 +792,59 @@ item.dateValue;
 });
 
 
+
+
+
+
+// NO DATA FIX
+
+if(minAQI == 99999)
+{
+
+minAQI = "No Data";
+
+freshDay = "-";
+
+}
+
+
+if(maxAQI == 0)
+{
+
+maxAQI = "No Data";
+
+dangerDay = "-";
+
+}
+
+
+
+
+// UPDATE PANEL
 
 document.getElementById(
 "weeklyAnalysis")
 
 .innerHTML =
 
-"🟢 Freshest Air: " +
+"🟢 Freshest Air : " +
 
-bestDate +
+freshDay +
 
-" (" + bestAQI + ")<br><br>" +
+" (" + minAQI + ")<br><br>" +
 
-"🔴 Most Dangerous AQI: " +
 
-worstDate +
+"🔴 Most Dangerous AQI : " +
 
-" (" + worstAQI + ")";
+dangerDay +
+
+" (" + maxAQI + ")";
+
 
 });
 
 }
+
 
 
 
@@ -637,9 +856,9 @@ loadWeeklyGraph();
 
 
 
-// AUTO UPDATE EVERY 5 SECONDS
+// AUTO UPDATE
 
-setInterval(() => {
+setInterval(()=>{
 
 loadWeeklyGraph();
 
