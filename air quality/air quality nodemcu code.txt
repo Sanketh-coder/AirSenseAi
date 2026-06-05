@@ -1,155 +1,289 @@
-/* Code Written by Rishi Tiwari
- *  Website:- https://tricksumo.com
-*/
-
-
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
-#include "DHT.h"
-DHT dht;
-
-// Update HOST URL here
-
-#define HOST "192.168.36.24"          // Enter HOST URL without "http:// "  and "/" at the end of URL
-
-#define WIFI_SSID "BPS"            // WIFI SSID here                                   
-#define WIFI_PASSWORD "12345678"        // WIFI password here
-
-int humidity =0;
-int temperature=0;
-
-
-// Declare global variables which will be uploaded to server
-
-// defines pins numbers
-
-
-String  postData;
-String distance;
+#include <WiFiClientSecure.h>
+#include <DHT.h>
 
 
 
+#define DHTPIN D1
+#define DHTTYPE DHT11
+
+DHT dht(DHTPIN, DHTTYPE);
+
+
+// ================= WIFI =================
+
+#define WIFI_SSID "Sanketh"
+#define WIFI_PASSWORD "12345678"
 
 
 
-void setup() {
+// ================= SPRING BOOT IP =================
 
-//  pinMode(pumpPin, OUTPUT); //pump
-Serial.begin(115200); 
-dht.setup(D1);   /* D1 is used for data communication */
-  pinMode(A0,INPUT);  
-Serial.println("Communication Started \n\n");  
-delay(1000);
-  
-
-//pinMode(LED_BUILTIN, OUTPUT);     // initialize built in led on the board
- 
-
-WiFi.mode(WIFI_STA);   
-
-WiFi.disconnect();
-delay(100);                                  //try to connect with wifi
-Serial.print("Connecting to ");
-Serial.print(WIFI_SSID);
-WiFi.begin(WIFI_SSID, WIFI_PASSWORD);   
-
-while (WiFi.status() != WL_CONNECTED) 
-{ Serial.print(".");
-    delay(500); }
-
-Serial.println();
-Serial.print("Connected to ");
-Serial.println(WIFI_SSID);
-Serial.print("IP Address is : ");
-Serial.println(WiFi.localIP());    //print local IP address
-
-delay(30);
-}
-
-
-void loop() { 
-
-
- temperature = dht.getTemperature(); /* Get temperature value */
-   humidity = dht.getHumidity(); /* Get humidity value */
-  int mq135 = analogRead(A0); 
- 
-
-HTTPClient http;    // http object of class HTTPClient
-WiFiClient wclient; // wclient object of class WiFiClient   
+#define HOST "10.33.7.136"
 
 
 
+// ================= TELEGRAM =================
+
+String botToken = "8046339412:AAEsje2laBGjmpB2yCfj_ixnOc6S-gSOgH0";
+
+String chatID = "1378174658";
 
 
 
-// Convert integer variables to string
+// ================= DHT11 =================
 
 
- int temp= temperature ;
- int hum=humidity ;
-
-String temp1 = String(temp);  
-
-String hum1 = String(hum);  
-
-String gas=String(mq135);
+int humidity = 0;
+int temperature = 0;
 
 
 
+void setup()
+{
+
+  Serial.begin(115200);
+
+  delay(1000);
+
+  Serial.println("System Starting...");
 
 
-// distance = String(my_per);  
-//postData = "distance=" + distance;
-
-//String Wlevel = "Wlevele=" + distance;
+  // DHT11
+  dht.begin();
 
 
-// We can post values to PHP files as  example.com/dbwrite.php?name1=val1&name2=val2&name3=val3
-// Hence created variable postDAta and stored our variables in it in desired format
-// For more detials, refer:- https://www.tutorialspoint.com/php/php_get_post.htm
-
-// Update Host URL here:-  
+  // MQ135
+  pinMode(A0, INPUT);
 
 
+  // ================= WIFI =================
 
-  
-http.begin(wclient, "http://192.168.36.24:9094/weatherapp/"+ temp1+ "/" +hum1+ "/" +gas );              // Connect to host where MySQL databse is hosted
+  WiFi.mode(WIFI_STA);
 
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
+  Serial.print("Connecting to WiFi");
 
-http.addHeader("Content-Type", "application/x-www-form-urlencoded");            //Specify content-type header 
-int httpCode = http.GET();   // Send POST request to php file and store server response code in variable named httpCode
-Serial.println("Values are, distance = " + temp1+  "/" +hum1 );
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
 
-// if connection eatablished then do this
-if (httpCode == 200) { Serial.println("Values uploaded successfully."); 
-Serial.println(httpCode); 
-String webpage = http.getString();    // Get html webpage output and store it in a string
-Serial.println(webpage + "\n"); 
+    Serial.print(".");
+  }
+
+  Serial.println("");
+
+  Serial.println("WiFi Connected");
+
+  Serial.print("IP Address : ");
+
+  Serial.println(WiFi.localIP());
+
 }
 
 
 
+void loop()
+{
 
 
-// if failed to connect then return and restart
+// WIFI RECONNECT
 
-else { 
-  Serial.println(httpCode); 
-  Serial.println("Failed to upload values. \n"); 
-  http.end(); 
-  return; 
+if(WiFi.status() != WL_CONNECTED)
+{
+    Serial.println("WiFi Disconnected");
+
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+    delay(5000);
+
+    return;
+}
+
+
+  
+
+  // ================= DHT11 =================
+
+  temperature = dht.readTemperature();
+
+  humidity = dht.readHumidity();
+
+
+  // INVALID SENSOR VALUES FIX
+
+  if (isnan(temperature))
+  {
+    temperature = -1;
+  }
+
+  if (isnan(humidity))
+  {
+    humidity = -1;
   }
 
 
-//delay(3000); 
 
-//digitalWrite(LED_BUILTIN, LOW);
-//delay(3000);
-//digitalWrite(LED_BUILTIN, HIGH);
+
+// ================= SAFE DHT11 READING ================= 
+float tempRead = dht.readTemperature(); 
+float humRead = dht.readHumidity(); 
+
+// DHT11 DISCONNECTED 
+if(isnan(tempRead) || isnan(humRead)) {
+  temperature = -1;
+  humidity = -1; 
+  } 
+  else {
+    temperature = (int)tempRead; 
+    humidity = (int)humRead; 
+    }
+  
+
+
+
+  // ================= MQ135 =================
+
+// ================= SAFE MQ135 READING ================= 
+int mq135;
+
+int mqRead = analogRead(A0); 
+
+// MQ135 DISCONNECTED 
+if(mqRead <= 5) { 
+  mq135 = -1; 
+  } 
+  else { 
+    mq135 = mqRead; 
+    }
+
+
+
+  // ================= SERIAL MONITOR =================
+
+  Serial.println("========== SENSOR DATA ==========");
+
+  Serial.print("Temperature : ");
+
+  Serial.println(temperature);
+
+  Serial.print("Humidity : ");
+
+  Serial.println(humidity);
+
+  Serial.print("Gas Value : ");
+
+  Serial.println(mq135);
+
+  Serial.println("=================================");
+
+
+
+// ================= TELEGRAM ALERT =================
+
+static bool telegramSent = false;
+
+// DANGER LEVEL
+if(mq135 > 100)   // Change threshold as needed
+{
+    if(!telegramSent)
+    {
+        WiFiClientSecure client;
+        client.setInsecure();
+
+        HTTPClient http;
+
+        String url =
+        "https://api.telegram.org/bot" +
+        botToken +
+        "/sendMessage?chat_id=" +
+        chatID +
+        "&text=AIR_QUALITY_DANGER!_AQI_" +
+        String(mq135) +
+        "_TEMP_" +
+        String(temperature) +
+        "_HUM_" +
+        String(humidity);
+
+        http.begin(client, url);
+
+        int code = http.GET();
+
+        Serial.print("Telegram Code: ");
+        Serial.println(code);
+
+        Serial.println(http.getString());
+
+        http.end();
+
+        telegramSent = true;
+    }
+}
+else
+{
+    telegramSent = false;
+}
+
+  // ================= SEND DATA TO SPRING =================
+
+  WiFiClient client;
+
+  HTTPClient http;
+
+
+  String temp1 = String(temperature);
+
+  String hum1 = String(humidity);
+
+  String gas = String(mq135);
+
+
+
+  String url =
+    "http://" + String(HOST) +
+    ":9094/weatherapp/" +
+    temp1 + "/" +
+    hum1 + "/" +
+    gas;
+
+
+  Serial.println(url);
+
+
+
+  http.begin(client, url);
+
+  int httpCode = http.GET();
+
+
+
+  Serial.print("HTTP Response : ");
+
+  Serial.println(httpCode);
+
+
+
+  if (httpCode == 200)
+  {
+
+    Serial.println("Values uploaded successfully");
+
+  }
+
+  else
+  {
+
+    Serial.println("Upload Failed");
 
   }
 
 
 
+  http.end();
+
+
+  delay(1000);
+
+}
