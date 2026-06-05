@@ -34,6 +34,8 @@ public class WeatherController {
 	@Autowired 
 	private PollutionHistoryRepository prepo;
 	
+	private LocalDateTime lastBoardUpdate;
+	
 	@GetMapping("weatherapp/{temp1}/{hum1}/{gas}")
 	public String registerForm(@PathVariable("temp1")String   temp1, @PathVariable("hum1")String  hum1,@PathVariable("gas")String  gas )
 	{
@@ -77,6 +79,7 @@ public class WeatherController {
 		 prepo.save(history);
 		 
 		 
+		 lastBoardUpdate = LocalDateTime.now();
 		 
 		 return"/weather";
 	}
@@ -196,5 +199,27 @@ public class WeatherController {
 
     return prepo.findTop7ByOrderByIdDesc();
 
+    }
+    
+    
+    @GetMapping("/board-status")
+    @ResponseBody
+    public String boardStatus()
+    {
+        if(lastBoardUpdate == null)
+            return "OFFLINE";
+
+        long seconds =
+        java.time.Duration
+        .between(
+            lastBoardUpdate,
+            LocalDateTime.now()
+        )
+        .getSeconds();
+
+        if(seconds > 5)
+            return "OFFLINE";
+
+        return "ONLINE";
     }
 }

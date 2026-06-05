@@ -1,3 +1,6 @@
+//let lastDataTime = Date.now();
+
+
 // ================= ENABLE HUMAN VOICE =================
 
 window.speechSynthesis.onvoiceschanged =
@@ -120,6 +123,8 @@ fetch('/live-data')
 .then(res=>res.json())
 
 .then(data=>{
+	
+	lastDataTime = Date.now();
 
 
 let temp =
@@ -863,3 +868,85 @@ setInterval(()=>{
 loadWeeklyGraph();
 
 },5000);
+
+
+// ================= BOARD OFFLINE DETECTION =================
+/*
+setInterval(() => {
+
+    let boardOffline =
+    (Date.now() - lastDataTime) > 10000;
+
+    if(boardOffline)
+    {
+        document.getElementById("boardError")
+        .style.display = "block";
+
+        document.getElementById("dhtStatus")
+        .classList.add("danger-blink");
+
+        document.getElementById("mqStatus")
+        .classList.add("danger-blink");
+    }
+    else
+    {
+        document.getElementById("boardError")
+        .style.display = "none";
+
+        document.getElementById("dhtStatus")
+        .classList.remove("danger-blink");
+
+        document.getElementById("mqStatus")
+        .classList.remove("danger-blink");
+    }
+
+},1000);*/
+
+
+
+// BOARD STATUS CHECK
+
+setInterval(() => {
+
+fetch('/board-status')
+
+.then(res => res.text())
+
+.then(status => {
+
+if(status === "OFFLINE")
+{
+
+	document.getElementById("boardError")
+	.style.display = "block";
+
+	document.getElementById("boardError")
+	.classList.add("danger-blink");
+
+document.getElementById("dhtStatus")
+.classList.add("danger-blink");
+
+document.getElementById("mqStatus")
+.classList.add("danger-blink");
+
+}
+else
+{
+
+	document.getElementById("boardError")
+	.style.display = "none";
+
+	document.getElementById("boardError")
+	.classList.remove("danger-blink");
+
+document.getElementById("dhtStatus")
+.classList.remove("danger-blink");
+
+document.getElementById("mqStatus")
+.classList.remove("danger-blink");
+
+}
+
+});
+
+},1000);

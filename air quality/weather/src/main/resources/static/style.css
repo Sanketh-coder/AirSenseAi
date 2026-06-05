@@ -569,3 +569,33 @@ height:350px !important;
 max-height:350px !important;
 
 }
+
+
+
+
+
+.danger-blink{
+
+color:#ff0000 !important;
+
+font-weight:bold;
+
+animation:blinkRed 1s infinite;
+
+}
+
+@keyframes blinkRed{
+
+0%{
+opacity:1;
+}
+
+50%{
+opacity:0.2;
+}
+
+100%{
+opacity:1;
+}
+
+}
