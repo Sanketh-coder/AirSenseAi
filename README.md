@@ -233,8 +233,8 @@ http://localhost:9094
 
 # 👨‍💻 Developed By
 
-Sanketh R M
-Gokulkrishna Reddy 
+Sanketh R M,
+Gokulkrishna Reddy, 
 Pavan M
 
 Computer Science Engineering
