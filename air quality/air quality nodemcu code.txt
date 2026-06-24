@@ -13,22 +13,22 @@ DHT dht(DHTPIN, DHTTYPE);
 
 // ================= WIFI =================
 
-#define WIFI_SSID "Sanketh"
-#define WIFI_PASSWORD "12345678"
+#define WIFI_SSID "Wifi Name"
+#define WIFI_PASSWORD "Wifi Password"
 
 
 
 // ================= SPRING BOOT IP =================
 
-#define HOST "10.33.7.136"
+#define HOST "System IP address"
 
 
 
 // ================= TELEGRAM =================
 
-String botToken = "8046339412:AAEsje2laBGjmpB2yCfj_ixnOc6S-gSOgH0";
+String botToken = "Token ID";
 
-String chatID = "1378174658";
+String chatID = "ChatID";
 
 
 
